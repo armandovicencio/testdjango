@@ -1,0 +1,28 @@
+{% extends "core/base.html"%}
+
+{% block titulo %} STATS{% endblock %}
+
+{% block estilos %}
+{% endblock %}
+
+
+{% block contenido %}
+
+<div class='row mt-5'>
+        <div class='container col-5 align-content-center justify-content-center'>
+
+            <h3>Total de deseos concedidos para todos los usuarios: {{total_granted.count}} </h3>
+            <h2>Tus dseos concedidos: {{my_granted.count}}</h2>
+            <h1>Tus deseos pendientes: {{no_granted.count}}</h1>
+
+
+
+
+           
+        </div>
+</div>
+
+
+
+
+{% endblock %}

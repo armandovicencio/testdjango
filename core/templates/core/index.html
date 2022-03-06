@@ -1,0 +1,179 @@
+{% extends "core/base.html"%}
+
+{% block titulo %}All Wishes{% endblock %}
+
+{% block contenido %}
+
+<div class="container mt-5">
+    <h1>Hola {{request.session.usuario.nombre}}</h1>
+    <hr>
+    <h3>Tu Lista de Deseos</h3>
+
+    <table id="tabla-datatable" class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Date added</th>
+                <th>Actions</th>
+                
+               
+                
+            </tr>
+        </thead>
+
+        <tbody>
+           
+
+            {%for wish in wishes_usuario_session%}
+
+            <tr>
+                <td>{{wish.id}}</td>
+                <td>{{wish.item}}</td>
+                <td>{{wish.created_at}}</td>
+
+                <td>
+                    <a href="{% url 'wishes:stats'%}" class='btn ms-2 btn-primary'>Ver Estadsticas</a>
+
+                    <button 
+                        data-url="{%url 'wishes:destroy' pk=wish.id%}"
+                        class="btn btn-sm btn-danger btnMostrarModal"
+                    >
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button> 
+                   <a href="{% url 'wishes:edit' pk=wish.id %}" class="btn btn-sm btn-success"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Edit</a>
+                   <form action="{% url 'wishes:granted' pk=wish.id%}" method="post" class='d-inline-block'>
+                    {% csrf_token %}
+                    <input type="hidden" name="granted" value='2'>
+                    <button class="btn btn-warning btn-sm d-flex mb-2" type="submit">Cumplido!</button>
+                  </form>
+            
+                   
+ 
+                    
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        
+        </tbody>
+    </table>
+
+    
+
+</div>
+<div class="container col-12 mt-5">
+    <h2>Deseos Cumplidos:</h2>
+    <hr>
+    <table id="tabla-datatable" class='table table-striped table-bordered table-hover'>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Wisher</th>
+                <th>Date added</th>
+                <th>Date Granted</th>
+                <th>Likes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbod>
+            {%for wish in all_wishes_users%}
+            <tr>
+                <td>{{wish.item}}</td>
+                <td>{{wish.uploaded_by.nombre}}</td>
+                <td>{{wish.created_at}}</td>
+                <td>{{wish.date_grated}} {{wish.updated_at}}</td>
+                <td>
+                {%for totallike in total_likes %}
+                            {% if wish.id == totallike.id  %}
+                            <p>{{totallike.cantidad}}</p>
+                            {% endif %}
+                {%endfor%}
+                </td>
+                <td>
+                        {% for wish_nolike in nolikes_wish %}
+                        <p>{{like.users_who_like.id}}</p>
+                        {% if wish_nolike.id == wish.id%}
+                        <p>{{like.nombre}} {{wish.nombre}}</p>
+                        <a href="{% url 'wishes:like' pk=wish.id%}" class='btn btn-sm btn-primary'>Like</a>
+                        {% endif %}
+                        {%endfor%}
+                </td>
+            </tr>
+            {%endfor%}
+        </tbod>
+    </table>
+</div>
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">ELIMINANDO</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          ¿Seguro que quieres eliminar este registro?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="btnEliminar" data-url="" >Eliminar!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    $(".btnMostrarModal").click(function(){
+
+        const url = $(this).data("url");
+        
+        $("#btnEliminar").attr("data-url",url);
+
+        $("#exampleModal").modal("wish");
+
+    });
+
+    $("#btnEliminar").click(function(){
+
+        const url = $("#btnEliminar").attr("data-url");
+
+        $.get(url, function(data, status){
+            toastr.success("ELIMINADO");
+            location.reload();
+        });
+    });
+
+
+    $(document).ready( function () {
+
+        let htmlDataTable = "<'row'<'col-sm-12 col-md-8'lB><'col-sm-12 col-md-4'f>>" +
+        "<'row'<'col-sm-12'tr>>" +
+        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>";
+
+        $('#tabla-datatable').DataTable(
+            {
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.11.4/i18n/es-cl.json"
+                },
+                responsive: true,
+                dom: htmlDataTable,
+                buttons: [
+                    'copy', 'excel', 'pdf'
+                ]
+            }
+        );
+
+        
+    } );
+</script>
+
+{% endblock %}

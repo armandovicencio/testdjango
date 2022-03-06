@@ -1,0 +1,42 @@
+{% extends "core/base.html"%}
+
+{% block titulo %} BIENVENIDA{% endblock %}
+
+{% block estilos %}
+
+
+
+{% endblock %}
+{% block mensajeusuario %} <h2>Hello <b>{{request.session.usuario.nombre}}!</b> Let's edit your wish!</h2> {% endblock %}
+{% block contenido %}
+<div class='row'>
+<div class='d-flex col-6 align-content-center justify-content-center'>
+            <form class='' action='' method='post'>
+                {% csrf_token %}
+                {{ formModel.non_field_errors }}
+                {% for field in formModel %}
+                <div class="mb-2">
+                    <label for="{{ field.id_for_label }}" class="col-4 col-form-label">{{ field.label }}</label>
+                    <div class="col-12">
+                        {{ field }}
+                    </div>
+                    {% if field.errors %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {% for error in field.errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if field.help_text %}
+                    <p class="help">{{ field.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a class="btn btn-primary d-flex mb-2" href='{% url 'wishes:wishes'%}'>Cancel</a>
+                    <button class="btn btn-warning d-flex mb-2" type="submit">Edit</button>
+                </div>
+            </form>
+        </div>
+</div>
+{% endblock %}
